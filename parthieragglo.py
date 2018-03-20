@@ -10,6 +10,27 @@ class Group():
 	def __str__(self):
 		return str(self.elem)+" => "+str(self.sim)+" ("+str(self.ind)+")"
 
+class Node():
+''' Inspired by : https://stackoverflow.com/questions/1894846/printing-bfs-binary-tree-in-level-order-with-specific-formatting'''
+	def __init__(self, val, left=None, right=None):
+		self.val = val
+		self.left = left
+		self.right = right
+
+	def __print__(self):
+		curLevel = [self]
+		while curLevel: #will break on leaves (=None)
+			nextLevel = []
+			for elem in curLevel:
+				''' ADD PADDING BETWEEN ELEMENTS '''
+				print elem.val+" " #Display element
+				if elem.left:
+					nextLevel.append(elem.left)
+				if elem.right:
+					nextLevel.append(elem.right)
+			print
+			curLevel = nextLevel
+
 ### MAIN ###
 repMatrix = [[10 ,  6 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0],
 			[6 ,  10 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0],
@@ -47,7 +68,7 @@ for i in range(len(repMatrix)-1): #N-1 Merge
 		if mx < gr.sim: #Maximum Similarity
 			mx = gr.sim
 			index = [j,gr.ind]
-	print "Found max: "+str(mx)+" @"+str(index)
+	'''print "Found max: "+str(mx)+" @"+str(index)'''
 
 	# Calculing group index
 	gindex = [index[0],-1]
