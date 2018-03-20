@@ -2,34 +2,58 @@
 # -*- coding: utf-8 -*-
 
 class Group():
-	def __init__(self,col,sim,ind):
+	def __init__(self,col,sim,ind, node):
 		self.elem = col
 		self.sim = sim
 		self.ind = ind
+		self.node = node
 
 	def __str__(self):
 		return str(self.elem)+" => "+str(self.sim)+" ("+str(self.ind)+")"
 
 class Node():
-''' Inspired by : https://stackoverflow.com/questions/1894846/printing-bfs-binary-tree-in-level-order-with-specific-formatting'''
-	def __init__(self, val, left=None, right=None):
+	def __init__(self, val=" ", left=None, right=None):
 		self.val = val
 		self.left = left
 		self.right = right
 
-	def __print__(self):
+	def basicDisplay(self):
+		''' Inspired by : https://stackoverflow.com/questions/1894846/printing-bfs-binary-tree-in-level-order-with-specific-formatting'''
+		myString = "\n"
 		curLevel = [self]
 		while curLevel: #will break on leaves (=None)
 			nextLevel = []
 			for elem in curLevel:
 				''' ADD PADDING BETWEEN ELEMENTS '''
-				print elem.val+" " #Display element
+				myString += str(elem.val)+" " #Display element
 				if elem.left:
 					nextLevel.append(elem.left)
 				if elem.right:
 					nextLevel.append(elem.right)
-			print
+			myString += "\n"			
 			curLevel = nextLevel
+		return myString
+
+	def __nonzero__(self):
+		return self.val != " "
+
+	def __str__(self):
+		curLevel = [self]
+		out = []
+		while curLevel:
+			out.append(" ".join([str(node.val) for node in curLevel]))
+			if any(node for node in curLevel):
+				children = []
+				for node in curLevel:
+					if (node.val != " "):
+						for subnode in (node.left,node.right):
+							children.append(subnode if subnode else Node())
+					else:
+						children.append(node)
+				curLevel = children
+			else:
+				break
+		return ("\n"+"\n".join(out))
 
 ### MAIN ###
 repMatrix = [[10 ,  6 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0],
@@ -56,7 +80,7 @@ for i in range(len(repMatrix)):
 '''Creation of differents clusters'''
 groups = []
 for i in range(len(repMatrix)):
-	g = Group([i],max(worMatrix[i]),worMatrix[i].index(max(worMatrix[i])))
+	g = Group([i],max(worMatrix[i]),worMatrix[i].index(max(worMatrix[i])),Node([i]))
 	groups.append(g)	
 	#print g
 
@@ -68,7 +92,7 @@ for i in range(len(repMatrix)-1): #N-1 Merge
 		if mx < gr.sim: #Maximum Similarity
 			mx = gr.sim
 			index = [j,gr.ind]
-	'''print "Found max: "+str(mx)+" @"+str(index)'''
+	print "Found max: "+str(mx)+" @"+str(index)
 
 	# Calculing group index
 	gindex = [index[0],-1]
@@ -86,6 +110,9 @@ for i in range(len(repMatrix)-1): #N-1 Merge
 	# Merge Elements
 	disp = dest.elem
 	dest.elem = dest.elem+source.elem
+	# Merge Nodes
+	dest.node = Node(dest.elem,dest.node,source.node)
+	# Remove Source
 	groups.remove(source)
 	# Update clusters'sim
 	for g in groups:
@@ -104,3 +131,5 @@ for i in range(len(repMatrix)-1): #N-1 Merge
 	dest.sim = mx
 	print "Merged "+str(gindex)+":  "+str(disp)+" & "+str(source.elem)
 	#print dest
+#print(groups[0].node.basicDisplay())
+print(groups[0].node)
